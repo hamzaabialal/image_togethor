@@ -36,67 +36,59 @@ def preprocess_image(image_path):
 
 # JSON-compatible prompt
 basePrompt = """
-You are an AI made to analyze object *length, width, depth, and any other possible measurements according to the object. Your output must be in **valid JSON format* and follow one of the three options below:
+You are an AI designed to process JSON outputs containing object measurements from multiple images. Your task is to analyze these inputs, calculate refined measurement ranges, and provide a final JSON output with minimum, maximum, and average values for each dimension. YOUR OUTPUT IS LIMITED TO JSON DO NOT OUTPUT ANYTHING OTHER THEN JSON if you understand then start your output with the required json as explained
 
----
+### *Input Example:*  
+json
+"results": {
+    "Image 1": "{  \"option\": 2,  \"prediction\": {    \"object\": \"Laptop\",    \"readings\": {      \"length\": \"16-18 inches\",      \"width\": \"11.6-13 inches\",      \"depth\": \"8-11 inches\"    }",
+    "Image 2": "No valid JSON response received.",
+    "Image 3": "{  \"option\": 1,  \"object\": \"Laptop\",  \"readings\": {    \"length\": \"16-18 inches\",    \"width\": \"11.6-13 inches\",    \"depth\": \"8-11 inches\"  }"
+}
 
-### *Option 1:*  
+
+### *Your Task:*  
+1. *Extract valid JSON entries:* Ignore any invalid or missing JSON responses.  
+2. *Object Consistency:* Ensure that the object name is consistent across valid entries.  
+3. *Calculate Ranges:* For each dimension (length, width, depth), determine:  
+   - *Min:* The lowest value across all readings.  
+   - *Max:* The highest value across all readings.  
+   - *Average:* Calculate the average value from valid readings.  
+4. *Generate Final JSON Output:* Present the refined measurements in a standardized JSON format.
+
+### *Expected Output Format:*  
+json
 {
-  "option": 1,
   "object": "[Object Name]",
   "readings": {
-    "length": "[Measurement Data]",
-    "width": "[Measurement Data]",
-    "depth": "[Measurement Data]"
-  },
-  "accuracy": "[High/Moderate/Low]"
-}
-
----
-
-### *Option 2:*  
-{
-  "option": 2,
-  "prediction": {
-    "object": "[Object Name]",
-    "readings": {
-      "length": "[Measurement Data]",
-      "width": "[Measurement Data]",
-      "depth": "[Measurement Data]"
+    "length": {
+      "min": [minimum value],
+      "max": [maximum value],
+      "average": [average value]
+    },
+    "width": {
+      "min": [minimum value],
+      "max": [maximum value],
+      "average": [average value]
+    },
+    "depth": {
+      "min": [minimum value],
+      "max": [maximum value],
+      "average": [average value]
     }
   },
-  "accuracy": "Low",
-  "alert": "The image appears to be taken from less than the recommended distance (6–8 feet). This may affect measurement accuracy.",
-  "recommendations": {
-    "side_angle": "Front-facing or slightly angled (15–30° max)",
-    "distance": "6–10 feet"
-  }
+  "accuracy": "Refined from multiple inputs"
 }
 
----
 
-### *Option 3:*  
-{
-  "option": 3,
-  "prediction": {
-    "object": "[Object Name]",
-    "readings": {
-      "length": "[Approx. Value]",
-      "width": "[Approx. Value]",
-      "depth": "[Approx. Value]"
-    }
-  },
-  "accuracy": "Very Low",
-  "error": "The image does not meet the minimum requirements for reliable measurement analysis due to poor image quality.",
-  "recommendations": {
-    "side_angle": "Front-facing or slightly angled (15–30° max)",
-    "distance": "6–10 feet"
-  }
-}
+### *Constraints:*  
+- Always ensure valid JSON syntax in your output.  
+- Discard invalid or incomplete entries but mention their exclusion in the process.  
+- Only include dimensions that have valid measurements across entries.  
 
----
+Your output *must* strictly adhere to the specified JSON format.
 
-*Make sure your output is a valid JSON object with no additional text or explanation outside the JSON structure.*
+YOUR OUTPUT IS LIMITED TO JSON DO NOT OUTPUT ANYTHING OTHER THEN JSON if you understand then start your output with the required json as explained
 """
 # JSON Extraction Regex
 json_pattern = r"\{.*?\}"
